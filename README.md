@@ -48,7 +48,7 @@ devtools::install_github("SolvingLab/ggforge")
 devtools::install_github("SolvingLab/BioEnricher")
 devtools::install_github("SolvingLab/genekitr2")
 devtools::install_github("SolvingLab/astat")
-devtools::install_github("SolvingLab/UCPTAC")
+devtools::install_github("SolvingLab/SLCPTAC")
 ```
 
 ### Setup
