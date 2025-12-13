@@ -44,9 +44,9 @@ BiocManager::install(c("fgsea", "ComplexHeatmap"))
 devtools::install_github("SolvingLab/SLCPTAC")
 
 # Install dependencies from SolvingLab
-devtools::install_github("SolvingLab/ggforge")
+devtools::install_github("Zaoqu-Liu/ggforge")
 devtools::install_github("SolvingLab/BioEnricher")
-devtools::install_github("SolvingLab/genekitr2")
+devtools::install_github("Zaoqu-Liu/genekitr2")
 devtools::install_github("SolvingLab/astat")
 devtools::install_github("SolvingLab/SLCPTAC")
 ```
