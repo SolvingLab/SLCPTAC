@@ -840,7 +840,7 @@ Examples:
 If you use SLCPTAC in your research, please cite:
 
 ```
-Liu, Z. (2024). SLCPTAC: Multi-Omics Analysis Toolkit for CPTAC Cancer Database.
+Liu, Z. (2025). SLCPTAC: Multi-Omics Analysis Toolkit for CPTAC Cancer Database.
 R package version 1.2.0. https://github.com/SolvingLab/SLCPTAC
 
 CPTAC Network. (2020). Clinical Proteomic Tumor Analysis Consortium.
