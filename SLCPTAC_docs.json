@@ -1,0 +1,245 @@
+{
+  "cptac_correlation": {
+    "package": "SLCPTAC",
+    "function_name": "cptac_correlation",
+    "title": "CPTAC Correlation and Association Analysis",
+    "description": "Comprehensive correlation and association analysis covering 7 scenarios: Scenario 1: 1 continuous vs 1 continuous → Scatter plot (CorPlot) or Lollipop Scenario 2: 1 vs multiple continuous → LollipopPlot or DotPlot Scenario 3: Multiple vs multiple continuous → DotPlot (correlation matrix) Scenario 4: 1 categorical vs 1 continuous → BoxPlot Scenario 5-6: Multiple BoxPlots Scenario 7: Categorical vs categorical → Percentage BarPlot or Heatmap Automatically detects scenario and applies appropriate statistical test and visualization.",
+    "user_queries": ["**Intra-Omics Analysis** (same omics layer, different genes):", "Are TP53 and MDM2 mRNA levels correlated in breast cancer?", "Do PIK3CA, AKT1, and MTOR genes show coordinated mRNA expression?", "Is AKT1 protein level correlated with MTOR protein level?", "Are mTOR pathway proteins (MTOR, RPS6, EIF4E) co-expressed?", "Which genes in the PI3K pathway show strongest mRNA co-expression?", "Do apoptosis genes (BCL2, BAX, BAK1) show coordinated expression?", "Are cell cycle genes (CDK4, CCND1, RB1) co-expressed in tumors?", "**Transcriptome-Proteome Analysis** (cross-omics):", "What is the correlation between TP53 mRNA and protein levels?", "Does TP53 protein abundance correlate with its mRNA expression?", "Which genes show strong mRNA-protein correlation?", "Which genes have poor mRNA-protein correlation (post-translational regulation)?", "Is mRNA-protein correlation consistent across cancer types?", "Does ERBB2 mRNA level predict its protein abundance in breast cancer?", "Are oncogene mRNA and protein levels correlated?", "**Protein-Phosphorylation Analysis**:", "What are the phosphorylation sites of AKT1 protein?", "Does AKT1 protein level correlate with its phosphorylation?", "Which AKT1 phosphorylation sites correlate with protein abundance?", "Does MTOR protein correlate with its downstream phosphorylation?", "Are AKT1 and MTOR phosphorylation sites correlated?", "Is there cross-talk between AKT1 and ERK phosphorylation?", "Does RPS6 phosphorylation indicate mTOR pathway activation?", "What pathway proteins show coordinated phosphorylation?", "Do upstream kinases correlate with substrate phosphorylation?", "Which phosphorylation sites are stoichiometrically regulated?", "Are phosphorylation networks rewired in mutant tumors?", "**Mutation Impact Analysis**:", "Is PIK3CA mutation associated with AKT1 phosphorylation?", "Does EGFR mutation affect EGFR protein phosphorylation?", "What phosphorylation events are affected by TP53 mutation?", "What phosphorylation changes occur in PIK3CA mutant tumors?", "Which phosphorylation sites are affected by kinase mutations?", "Does VHL mutation affect HIF1A protein levels?", "Does TP53 mutation affect pathway protein expression?", "Which mutations affect EGFR protein level?", "Does KRAS mutation alter downstream signaling proteins?", "Are driver mutations associated with specific protein signatures?", "**Co-Mutation and Mutual Exclusivity**:", "Are KRAS and EGFR mutations mutually exclusive?", "Which mutations co-occur in the same tumors?", "Are TP53 and PIK3CA mutations co-occurring in breast cancer?", "Which mutation pairs show mutual exclusivity in lung cancer?", "Do oncogene and tumor suppressor mutations co-occur?", "What is the co-mutation pattern in pancreatic cancer?", "**Copy Number-Expression Analysis**:", "How do copy number changes affect protein expression?", "Does ERBB2 copy number correlate with protein level?", "Does gene amplification drive mRNA overexpression?", "Which genes show copy number-driven expression changes?", "Is protein expression buffered against copy number changes?", "Does CNV affect mRNA more than protein?", "**Methylation-Expression Analysis**:", "Does DNA methylation correlate with mRNA expression?", "Does TP53 promoter methylation silence its expression?", "Which genes show methylation-driven silencing?", "Is hypermethylation associated with low protein expression?", "Does methylation affect tumor suppressor expression?", "**Clinical Variable Associations**:", "Does tumor stage correlate with protein phosphorylation?", "Which clinical variables associate with protein phosphorylation?", "Does patient age affect pathway protein levels?", "Are there gender differences in protein expression?", "Does age correlate with global phosphorylation levels?", "Does BMI affect metabolic enzyme expression?", "Does tumor grade correlate with oncogene expression?", "Are clinical outcomes related to protein levels?", "**Multi-Cancer Comparison**:", "Is TP53 mRNA-protein correlation consistent across cancer types?", "Do mutation effects vary by cancer type?", "Which biomarkers are pan-cancer vs cancer-specific?", "Are pathway activations similar across cancers?", "Does the same mutation have different effects in different cancers?", "Which phosphorylation sites are universally activated?", "**Pathway and Network Analysis**:", "What proteins correlate with TP53 protein levels?", "Are receptor and ligand proteins coordinately expressed?", "Do PI3K pathway proteins show coordinated expression?", "Which proteins are co-regulated in the mTOR pathway?", "Are apoptosis proteins coordinately dysregulated?", "Does STAT3 phosphorylation correlate with immune signatures?", "**Therapeutic Target Discovery**:", "Which phosphorylation sites are druggable targets?", "Does protein phosphorylation predict treatment response?", "Which proteins drive survival in pancreatic cancer?", "Which phosphorylation sites predict survival?", "Are targetable mutations associated with protein changes?", "Which kinase-substrate pairs are therapeutically relevant?", "**Proteogenomic Integration**:", "What protein-phospho patterns distinguish cancer subtypes?", "What is the relationship between mutation burden and protein expression?", "What proteins show post-translational regulation?", "Which omics layers are most predictive of phenotype?", "How do genomic alterations propagate to the proteome?", "Which genes show strong multi-omics concordance?"],
+    "usage": "cptac_correlation( var1, var1_modal, var1_cancers, var2, var2_modal, var2_cancers, method = \"pearson\", use = \"pairwise.complete.obs\", p_adjust_method = \"BH\", alpha = 0.05 )",
+    "parameters": [
+      {
+        "name": "var1",
+        "has_default": false,
+        "description": "Character vector. Gene names or clinical variables for variable 1. Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"KRAS\", \"EGFR\", \"ALK\")"
+      },
+      {
+        "name": "var1_modal",
+        "has_default": false,
+        "description": "Character. Omics layer for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\""
+      },
+      {
+        "name": "var1_cancers",
+        "has_default": false,
+        "description": "Character vector. Cancer types for var1. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Can be single or multiple: \"BRCA\" or c(\"BRCA\", \"LUAD\", \"COAD\")"
+      },
+      {
+        "name": "var2",
+        "has_default": false,
+        "description": "Character vector. Gene names or clinical variables for variable 2. Same format as var1. Required for correlation analysis."
+      },
+      {
+        "name": "var2_modal",
+        "has_default": false,
+        "description": "Character. Omics layer for var2. Same options as var1_modal."
+      },
+      {
+        "name": "var2_cancers",
+        "has_default": false,
+        "description": "Character vector. Cancer types for var2. Can be same as or different from var1_cancers."
+      },
+      {
+        "name": "method",
+        "has_default": true,
+        "default_value": "\"pearson\"",
+        "description": "Character. Correlation method for continuous variables (default: \"pearson\"). Options: \"pearson\", \"spearman\", \"kendall\" Note: Only"
+      },
+      {
+        "name": "use",
+        "has_default": true,
+        "default_value": "\"pairwise.complete.obs\"",
+        "description": "d for continuous vs continuous scenarios. Ignored for categorical variables. use Character. Handling of missing values (default: \"pairwise.complete.obs\"). Options: \"everything\", \"all.obs\", \"complete.obs\", \"na.or.complete\", \"pairwise.complete.obs\""
+      },
+      {
+        "name": "p_adjust_method",
+        "has_default": true,
+        "default_value": "\"BH\"",
+        "description": "Character. Multiple testing correction method (default: \"BH\"). Options: \"BH\" (Benjamini-Hochberg), \"bonferroni\", \"holm\", \"hochberg\", \"hommel\", \"BY\", \"fdr\", \"none\""
+      },
+      {
+        "name": "alpha",
+        "has_default": true,
+        "default_value": "0.05",
+        "description": "Numeric. Significance threshold for marking significant results (default: 0.05). Used for categorical vs continuous tests (Wilcoxon, Kruskal-Wallis)."
+      }
+    ],
+    "examples": "## Not run: \n##D # Scenario 1: mRNA-Protein correlation\n##D result <- cptac_correlation(\n##D   var1 = \"TP53\", var1_modal = \"RNAseq\", var1_cancers = \"BRCA\",\n##D   var2 = \"TP53\", var2_modal = \"Protein\", var2_cancers = \"BRCA\"\n##D )\n##D \n##D # Scenario 2: Protein vs multiple Phospho sites\n##D result <- cptac_correlation(\n##D   var1 = \"AKT1\", var1_modal = \"Protein\", var1_cancers = \"BRCA\",\n##D   var2 = c(\"AKT1\", \"MTOR\", \"RPS6\"), var2_modal = \"Phospho\", var2_cancers = \"BRCA\"\n##D )\n##D \n##D # Scenario 3: Phospho correlation matrix (removes diagonal)\n##D result <- cptac_correlation(\n##D   var1 = \"AKT1\", var1_modal = \"Phospho\", var1_cancers = \"BRCA\",\n##D   var2 = \"AKT1\", var2_modal = \"Phospho\", var2_cancers = \"BRCA\"\n##D )\n##D \n##D # Scenario 4: Mutation impact on expression\n##D result <- cptac_correlation(\n##D   var1 = \"KRAS\", var1_modal = \"Mutation\", var1_cancers = \"LUAD\",\n##D   var2 = \"EGFR\", var2_modal = \"RNAseq\", var2_cancers = \"LUAD\"\n##D )\n##D \n##D # Scenario 5: Multiple mutations vs protein\n##D result <- cptac_correlation(\n##D   var1 = \"AKT1\", var1_modal = \"Protein\", var1_cancers = \"BRCA\",\n##D   var2 = c(\"PIK3CA\", \"TP53\"), var2_modal = \"Mutation\", var2_cancers = \"BRCA\"\n##D )\n##D \n##D # Scenario 6: Clinical vs Phospho\n##D result <- cptac_correlation(\n##D   var1 = \"Tumor_Stage\", var1_modal = \"Clinical\", var1_cancers = \"LUAD\",\n##D   var2 = \"AKT1\", var2_modal = \"Phospho\", var2_cancers = \"LUAD\"\n##D )\n##D \n##D # Scenario 7: Co-mutation analysis (log2(OR) heatmap)\n##D result <- cptac_correlation(\n##D   var1 = c(\"KRAS\", \"EGFR\", \"ALK\"), var1_modal = \"Mutation\", var1_cancers = \"LUAD\",\n##D   var2 = c(\"TP53\", \"STK11\"), var2_modal = \"Mutation\", var2_cancers = \"LUAD\"\n##D )\n##D \n##D # Multi-cancer comparison\n##D result <- cptac_correlation(\n##D   var1 = \"TP53\", var1_modal = \"RNAseq\", var1_cancers = c(\"BRCA\", \"LUAD\", \"COAD\"),\n##D   var2 = \"TP53\", var2_modal = \"Protein\", var2_cancers = c(\"BRCA\", \"LUAD\", \"COAD\")\n##D )\n## End(Not run)\n\n\n\n",
+    "return_value": "A list with 3 components: stats Data frame with statistical results. Columns vary by scenario: Continuous: var1_feature, var2_feature, r, p, p_adjusted, method Categorical: var1_feature, var2_feature, p_value, test_method, effect_size, odds_ratio, log2_or Mixed: categorical, continuous, p_value, test_method, effect_size, n_groups plot Plot object (ggplot, patchwork, or ComplexHeatmap). Direct access: result$plot. Size info: attr(result$plot, \"width/height\") raw_data Data frame with merged input data (all samples and features)",
+    "references": ["**CPTAC Database**:  Clinical Proteomic Tumor Analysis Consortium (2020). Proteogenomic characterization of human cancers. Nature, 578, 34-35. \\doi{10.1038/d41586-020-00432-0}  Gillette MA, et al. (2020).", "Proteogenomic Characterization Reveals Therapeutic Vulnerabilities in Lung Adenocarcinoma. Cell, 182(1):200-225. \\doi{10.1016/j.cell.2020.06.013}  Database portal: \\url{https://proteomics.cancer.gov/programs/cptac}"],
+    "formatted_arguments": "var1: Character vector. Gene names or clinical variables for variable 1. Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"KRAS\", \"EGFR\", \"ALK\")\nvar1_modal: Character. Omics layer for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\"\nvar1_cancers: Character vector. Cancer types for var1. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Can be single or multiple: \"BRCA\" or c(\"BRCA\", \"LUAD\", \"COAD\")\nvar2: Character vector. Gene names or clinical variables for variable 2. Same format as var1. Required for correlation analysis.\nvar2_modal: Character. Omics layer for var2. Same options as var1_modal.\nvar2_cancers: Character vector. Cancer types for var2. Can be same as or different from var1_cancers.\nmethod: Character. Correlation method for continuous variables (default: \"pearson\"). Options: \"pearson\", \"spearman\", \"kendall\" Note: Only\nuse: d for continuous vs continuous scenarios. Ignored for categorical variables. use Character. Handling of missing values (default: \"pairwise.complete.obs\"). Options: \"everything\", \"all.obs\", \"complete.obs\", \"na.or.complete\", \"pairwise.complete.obs\"\np_adjust_method: Character. Multiple testing correction method (default: \"BH\"). Options: \"BH\" (Benjamini-Hochberg), \"bonferroni\", \"holm\", \"hochberg\", \"hommel\", \"BY\", \"fdr\", \"none\"\nalpha: Numeric. Significance threshold for marking significant results (default: 0.05). Used for categorical vs continuous tests (Wilcoxon, Kruskal-Wallis).",
+    "simple_arguments": "var1: Character vector. Gene names or clinical variables for variable 1. Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"KRAS\", \"EGFR\", \"ALK\")\nvar1_modal: Character. Omics layer for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\"\nvar1_cancers: Character vector. Cancer types for var1. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Can be single or multiple: \"BRCA\" or c(\"BRCA\", \"LUAD\", \"COAD\")\nvar2: Character vector. Gene names or clinical variables for variable 2. Same format as var1. Required for correlation analysis.\nvar2_modal: Character. Omics layer for var2. Same options as var1_modal.\nvar2_cancers: Character vector. Cancer types for var2. Can be same as or different from var1_cancers."
+  },
+  "cptac_enrichment": {
+    "package": "SLCPTAC",
+    "function_name": "cptac_enrichment",
+    "title": "CPTAC Enrichment Analysis",
+    "description": "Perform enrichment analysis (Scenarios 8-15): - Categorical variable: * Genome-wide (Scenario 8): DEA → NetworkPlot * Enrichment (Scenario 9): DEA → GSEA → Paired DotPlot - Multiple categorical variables: * Genome-wide (Scenario 10): Multi-DEA → DotPlot * Enrichment (Scenario 11): Multi-DEA → GSEA → Matrix DotPlot - Continuous variable: * Genome-wide (Scenario 12): Correlation → NetworkPlot * Enrichment (Scenario 13): Correlation → GSEA → Paired DotPlot - Multiple continuous variables: * Genome-wide (Scenario 14): Multi-Correlation → DotPlot * Enrichment (Scenario 15): Multi-Correlation → GSEA → Matrix DotPlot",
+    "user_queries": ["**Genome-Wide Discovery**:", "Which proteins correlate with TP53 protein level?", "What genes are affected by KRAS mutation?", "Which proteins change with AKT1 phosphorylation?", "What proteome-wide changes occur in PIK3CA mutants?", "Which proteins are co-expressed with EGFR?", "What genes correlate with tumor grade?", "Which proteins show coordinated expression with mTOR?", "**Pathway Enrichment**:", "Which pathways are enriched in TP53 mutants?", "What biological processes are affected by PIK3CA mutation?", "Which signaling pathways correlate with AKT1 expression?", "What pathways are activated in EGFR-high tumors?", "Which GO terms are associated with MTOR protein level?", "What KEGG pathways are dysregulated in high-grade tumors?", "Which Reactome pathways correlate with survival?", "**Method Selection**:", "Should I use genome scan or pathway enrichment?", "Which enrichment database is best for my analysis?", "How do I find genes affected by a specific mutation?", "What's the difference between MsigDB and GO?", "When should I use KEGG vs Reactome?", "How to identify pathway activation from proteomics?", "Which analysis reveals druggable targets?", "**Interpretation**:", "What does NES (normalized enrichment score) mean?", "How do I interpret pathway enrichment results?", "What is a good correlation threshold for genome scan?", "How many pathways should be significantly enriched?", "What does leading edge genes represent?", "How to validate enrichment findings?", "Which enriched pathways are therapeutically relevant?", "**Follow-Up Analysis**:", "After finding correlated proteins, what's next?", "How to validate pathway enrichment experimentally?", "Can I check survival impact of enriched genes?", "How to compare pathways across cancer types?", "What genes in enriched pathways are druggable?", "How to visualize pathway networks?", "Can I correlate pathway scores with clinical outcomes?"],
+    "usage": "cptac_enrichment( var1, var1_modal, var1_cancers, analysis_type = \"enrichment\", enrich_database = \"MsigDB\", enrich_ont = \"BP\", genome_modal = \"Protein\", method = \"pearson\", top_n = 50, n_workers = 6, kegg_category = \"pathway\", msigdb_category = \"H\", hgdisease_source = \"do\", mesh_method = \"gendoo\", mesh_category = \"A\", enrichrdb_library = \"Cancer_Cell_Line_Encyclopedia\" )",
+    "parameters": [
+      {
+        "name": "var1",
+        "has_default": false,
+        "description": "Character vector. Variable names (genes or clinical variables)"
+      },
+      {
+        "name": "var1_modal",
+        "has_default": false,
+        "description": "Character. Modal type for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\""
+      },
+      {
+        "name": "var1_cancers",
+        "has_default": false,
+        "description": "Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\""
+      },
+      {
+        "name": "analysis_type",
+        "has_default": true,
+        "default_value": "\"enrichment\"",
+        "description": "Character. Type of enrichment analysis (default: \"enrichment\") - \"genome\": Genome-wide scan (DEA or correlation) → NetworkPlot or DotPlot - \"enrichment\": Pathway enrichment (GSEA) → Paired DotPlot or Matrix"
+      },
+      {
+        "name": "enrich_database",
+        "has_default": true,
+        "default_value": "\"MsigDB\"",
+        "description": "Character. Database for pathway enrichment (default: \"MsigDB\") Options: \"MsigDB\" (recommended), \"GO\", \"KEGG\", \"Wiki\", \"Reactome\", \"Mesh\", \"HgDisease\", \"Enrichrdb\" Note: Different databases have different numbers of gene sets (MsigDB Hallmark: 50, GO BP: ~15000, KEGG: ~300)"
+      },
+      {
+        "name": "enrich_ont",
+        "has_default": true,
+        "default_value": "\"BP\"",
+        "description": "Character. Gene Ontology sub-ontology, only used when enrich_database = \"GO\" (default: \"BP\") Options: \"BP\" (Biological Process), \"CC\" (Cellular Component), \"MF\" (Molecular Function), \"all\""
+      },
+      {
+        "name": "genome_modal",
+        "has_default": true,
+        "default_value": "\"Protein\"",
+        "description": "Character. Omics layer to scan in genome-wide analysis (default: \"Protein\") Options: \"Protein\", \"RNAseq\", \"Phospho\", \"Methylation\", \"logCNA\" **IMPORTANT**: For analysis_type = \"enrichment\" (GSEA), genome_modal is automatically set to \"Protein\" regardless of input Reason: GSEA requires stable gene-level expression, and Protein is the most suitable omics layer"
+      },
+      {
+        "name": "method",
+        "has_default": true,
+        "default_value": "\"pearson\"",
+        "description": "Character. Correlation method for continuous variables (default: \"pearson\") Options: \"pearson\", \"spearman\", \"kendall\" Note: Only used for continuous variables (RNAseq, Protein, Phospho). Ignored for categorical variables (Mutation, Clinical)"
+      },
+      {
+        "name": "top_n",
+        "has_default": true,
+        "default_value": "50",
+        "description": "Integer. Number of top pathways to display in plot (default: 50) Note: stats will return ALL pathways, but plot only shows top N most significant pathways for clarity"
+      },
+      {
+        "name": "n_workers",
+        "has_default": true,
+        "default_value": "6",
+        "description": "Integer. Number of parallel workers for GSEA computation (default: 6) Tip: Increase for faster computation on multi-core systems, decrease if memory is limited"
+      },
+      {
+        "name": "kegg_category",
+        "has_default": true,
+        "default_value": "\"pathway\"",
+        "description": "Character. KEGG database category (default: \"pathway\") Options: \"pathway\", \"module\", \"enzyme\", \"disease\", \"drug\", \"network\" Only used when enrich_database = \"KEGG\""
+      },
+      {
+        "name": "msigdb_category",
+        "has_default": true,
+        "default_value": "\"H\"",
+        "description": "Character. MsigDB collection (default: \"H\" for Hallmark) Options: \"H\" (Hallmark, 50 gene sets), \"C1\" (Positional), \"C2-CGP\" (Chemical/Genetic), \"C2-CP\" (Canonical Pathways), \"C5-GO-BP\" (GO Biological Process), etc. Only used when enrich_database = \"MsigDB\""
+      },
+      {
+        "name": "hgdisease_source",
+        "has_default": true,
+        "default_value": "\"do\"",
+        "description": "Character. Human disease database source (default: \"do\") Options: \"do\" (Disease Ontology), \"ncg_v7\", \"ncg_v6\", \"disgenet\", \"covid19\" Only used when enrich_database = \"HgDisease\""
+      },
+      {
+        "name": "mesh_method",
+        "has_default": true,
+        "default_value": "\"gendoo\"",
+        "description": "Character. MeSH mapping method (default: \"gendoo\") Options: \"gendoo\", \"gene2pubmed\", \"RBBH\" Only used when enrich_database = \"Mesh\""
+      },
+      {
+        "name": "mesh_category",
+        "has_default": true,
+        "default_value": "\"A\"",
+        "description": "Character. MeSH descriptor category (default: \"A\") Only used when enrich_database = \"Mesh\""
+      },
+      {
+        "name": "enrichrdb_library",
+        "has_default": true,
+        "default_value": "\"Cancer_Cell_Line_Encyclopedia\"",
+        "description": "Character. Enrichr library name (default: \"Cancer_Cell_Line_Encyclopedia\") Only used when enrich_database = \"Enrichrdb\""
+      }
+    ],
+    "examples": "## Not run: \n##D # Example 1: Mutation vs Protein genome scan (Scenario 8)\n##D result <- cptac_enrichment(\n##D   var1 = \"KRAS\",\n##D   var1_modal = \"Mutation\",\n##D   var1_cancers = \"LUAD\",\n##D   analysis_type = \"genome\",\n##D   genome_modal = \"Protein\",\n##D   top_n = 30\n##D )\n##D \n##D # Example 2: Mutation vs GSEA enrichment (Scenario 9, default MsigDB Hallmark)\n##D result <- cptac_enrichment(\n##D   var1 = \"PIK3CA\",\n##D   var1_modal = \"Mutation\",\n##D   var1_cancers = \"BRCA\",\n##D   analysis_type = \"enrichment\",\n##D   top_n = 20 # genome_modal自动设为Protein\n##D )\n##D \n##D # Example 3: Use different databases\n##D # GO Biological Process\n##D result <- cptac_enrichment(\n##D   var1 = \"TP53\",\n##D   var1_modal = \"RNAseq\",\n##D   var1_cancers = \"BRCA\",\n##D   analysis_type = \"enrichment\",\n##D   enrich_database = \"GO\",\n##D   enrich_ont = \"BP\"\n##D )\n##D \n##D # KEGG Pathway\n##D result <- cptac_enrichment(\n##D   var1 = \"EGFR\",\n##D   var1_modal = \"Protein\",\n##D   var1_cancers = \"LUAD\",\n##D   analysis_type = \"enrichment\",\n##D   enrich_database = \"KEGG\",\n##D   kegg_category = \"pathway\"\n##D )\n##D \n##D # Reactome Pathways\n##D result <- cptac_enrichment(\n##D   var1 = \"AKT1\",\n##D   var1_modal = \"Phospho\",\n##D   var1_cancers = c(\"BRCA\", \"LUAD\"),\n##D   analysis_type = \"enrichment\",\n##D   enrich_database = \"Reactome\"\n##D )\n##D \n##D # Access results\n##D head(result$stats) # All pathways\n##D result$plot # View plot\n##D head(result$raw_data) # Full DEA/correlation results\n## End(Not run)\n\n\n\n",
+    "return_value": "List with three components: stats Data frame with enrichment results - For genome scan: Top genes (controlled by top_n for NetworkPlot, or all significant for DotPlot) - For GSEA enrichment: ALL pathways with NES, p-value, q-value, etc. plot Plot object (patchwork or ggplot) - Direct access: result$plot (no need for result$plot$plot) - Width/height stored as attributes: attr(result$plot, \"width\"), attr(result$plot, \"height\") - Plot types: NetworkPlot, DotPlot Paired, GSEA Paired, or GSEA Matrix raw_data Complete genome-wide analysis results (all genes, not just top N) - For categorical variables: Full DEA results (data.frame with logFC, p-value for all genes) - For continuous variables: Full correlation results (data.frame with r, p-value for all genes) - For multiple variables: List of results for each variable",
+    "references": ["**CPTAC Database**:  Clinical Proteomic Tumor Analysis Consortium (2020). Proteogenomic characterization of human cancers. Nature, 578, 34-35. \\doi{10.1038/d41586-020-00432-0}  Gillette MA, et al. (2020).", "Proteogenomic Characterization Reveals Therapeutic Vulnerabilities in Lung Adenocarcinoma. Cell, 182(1):200-225. \\doi{10.1016/j.cell.2020.06.013}  Database portal: \\url{https://proteomics.cancer.gov/programs/cptac}"],
+    "formatted_arguments": "var1: Character vector. Variable names (genes or clinical variables)\nvar1_modal: Character. Modal type for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\"\nvar1_cancers: Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\"\nanalysis_type: Character. Type of enrichment analysis (default: \"enrichment\") - \"genome\": Genome-wide scan (DEA or correlation) → NetworkPlot or DotPlot - \"enrichment\": Pathway enrichment (GSEA) → Paired DotPlot or Matrix\nenrich_database: Character. Database for pathway enrichment (default: \"MsigDB\") Options: \"MsigDB\" (recommended), \"GO\", \"KEGG\", \"Wiki\", \"Reactome\", \"Mesh\", \"HgDisease\", \"Enrichrdb\" Note: Different databases have different numbers of gene sets (MsigDB Hallmark: 50, GO BP: ~15000, KEGG: ~300)\nenrich_ont: Character. Gene Ontology sub-ontology, only used when enrich_database = \"GO\" (default: \"BP\") Options: \"BP\" (Biological Process), \"CC\" (Cellular Component), \"MF\" (Molecular Function), \"all\"\ngenome_modal: Character. Omics layer to scan in genome-wide analysis (default: \"Protein\") Options: \"Protein\", \"RNAseq\", \"Phospho\", \"Methylation\", \"logCNA\" **IMPORTANT**: For analysis_type = \"enrichment\" (GSEA), genome_modal is automatically set to \"Protein\" regardless of input Reason: GSEA requires stable gene-level expression, and Protein is the most suitable omics layer\nmethod: Character. Correlation method for continuous variables (default: \"pearson\") Options: \"pearson\", \"spearman\", \"kendall\" Note: Only used for continuous variables (RNAseq, Protein, Phospho). Ignored for categorical variables (Mutation, Clinical)\ntop_n: Integer. Number of top pathways to display in plot (default: 50) Note: stats will return ALL pathways, but plot only shows top N most significant pathways for clarity\nn_workers: Integer. Number of parallel workers for GSEA computation (default: 6) Tip: Increase for faster computation on multi-core systems, decrease if memory is limited\nkegg_category: Character. KEGG database category (default: \"pathway\") Options: \"pathway\", \"module\", \"enzyme\", \"disease\", \"drug\", \"network\" Only used when enrich_database = \"KEGG\"\nmsigdb_category: Character. MsigDB collection (default: \"H\" for Hallmark) Options: \"H\" (Hallmark, 50 gene sets), \"C1\" (Positional), \"C2-CGP\" (Chemical/Genetic), \"C2-CP\" (Canonical Pathways), \"C5-GO-BP\" (GO Biological Process), etc. Only used when enrich_database = \"MsigDB\"\nhgdisease_source: Character. Human disease database source (default: \"do\") Options: \"do\" (Disease Ontology), \"ncg_v7\", \"ncg_v6\", \"disgenet\", \"covid19\" Only used when enrich_database = \"HgDisease\"\nmesh_method: Character. MeSH mapping method (default: \"gendoo\") Options: \"gendoo\", \"gene2pubmed\", \"RBBH\" Only used when enrich_database = \"Mesh\"\nmesh_category: Character. MeSH descriptor category (default: \"A\") Only used when enrich_database = \"Mesh\"\nenrichrdb_library: Character. Enrichr library name (default: \"Cancer_Cell_Line_Encyclopedia\") Only used when enrich_database = \"Enrichrdb\"",
+    "simple_arguments": "var1: Character vector. Variable names (genes or clinical variables)\nvar1_modal: Character. Modal type for var1. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\"\nvar1_cancers: Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\""
+  },
+  "cptac_survival": {
+    "package": "SLCPTAC",
+    "function_name": "cptac_survival",
+    "title": "CPTAC Survival Analysis (Kaplan-Meier and Cox Regression)",
+    "description": "Comprehensive survival analysis covering 2 scenarios: Scenario 16: Single feature (1 gene in 1 cancer) → Kaplan-Meier curve + Cox regression Scenario 17: Multiple features → Forest plot showing hazard ratios Multiple features include: multiple genes, multiple cancers, or multiple phospho sites Automatically detects scenario based on number of features and applies appropriate analysis.",
+    "user_queries": ["**Prognostic Biomarker Discovery**:", "Does TP53 expression predict patient survival?", "Which genes are prognostic markers in breast cancer?", "Does AKT1 protein level predict clinical outcomes?", "Are phosphorylation sites prognostic in cancer?", "Which mutations affect patient survival?", "Does EGFR expression correlate with survival time?", "What proteins predict progression-free survival?", "**Survival Analysis Methods**:", "How to analyze gene expression for survival prediction?", "What is the optimal cutoff for continuous variables?", "How do I interpret hazard ratios?", "What is C-index and how to use it?", "Should I use OS or PFS for my analysis?", "How to compare survival across multiple genes?", "How to validate prognostic biomarkers?", "**Multi-Cancer Validation**:", "Is this prognostic marker pan-cancer or cancer-specific?", "Does TP53 predict survival in multiple cancer types?", "Which biomarkers are universally prognostic?", "Do mutation effects vary by cancer type?", "How to compare prognostic value across cancers?", "Which proteins show consistent survival association?", "**Clinical Translation**:", "Which phosphorylation sites predict treatment response?", "Does protein expression stratify patient risk groups?", "Which mutations identify high-risk patients?", "What biomarkers can guide therapeutic decisions?", "How do clinical variables affect survival prediction?", "Which molecular markers improve prognostic models?", "Can protein levels replace genomic markers for prognosis?", "**Integration with Other Analyses**:", "After finding prognostic genes, what's next?", "How to check if correlated genes are also prognostic?", "Can I test pathway-level survival associations?", "How to combine multiple biomarkers for risk score?", "What proteins in enriched pathways predict survival?", "How to build multivariate prognostic models?"],
+    "usage": "cptac_survival( var1, var1_modal, var1_cancers, surv_type = \"OS\", cutoff_type = \"optimal\", minprop = 0.1, percent = 0.25, palette = c(\"#ED6355\", \"#41A98E\", \"#EFA63A\", \"#3a6ea5\"), show_cindex = TRUE )",
+    "parameters": [
+      {
+        "name": "var1",
+        "has_default": false,
+        "description": "Character vector. Gene names or clinical variables. Single gene, single cancer → Scenario 16 (KM + Cox) Single gene, multiple cancers → Scenario 17 (Forest plot) Multiple genes → Scenario 17 (Forest plot) Phospho sites: Each site analyzed independently in Forest plot Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"AKT1\", \"MTOR\")"
+      },
+      {
+        "name": "var1_modal",
+        "has_default": false,
+        "description": "Character. Omics layer. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\" Note: Phospho sites will generate multiple features per gene"
+      },
+      {
+        "name": "var1_cancers",
+        "has_default": false,
+        "description": "Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Multiple cancers will use Forest plot (Scenario 17)"
+      },
+      {
+        "name": "surv_type",
+        "has_default": true,
+        "default_value": "\"OS\"",
+        "description": "Character. Type of survival endpoint (default: \"OS\"). \"OS\" - Overall Survival (time to death from any cause) \"PFS\" - Progression-Free Survival (time to disease progression or death)"
+      },
+      {
+        "name": "cutoff_type",
+        "has_default": true,
+        "default_value": "\"optimal\"",
+        "description": "Character. Method to dichotomize continuous variables (default: \"optimal\"). Only used for continuous variables (RNAseq, Protein, Phospho, logCNA, Methylation). Ignored for categorical variables (Mutation, Clinical). \"optimal\" - Maximizes log-rank test statistic (recommended) \"median\" - Use median value as cutoff \"mean\" - Use mean value as cutoff \"quantile\" - Use specified"
+      },
+      {
+        "name": "minprop",
+        "has_default": true,
+        "default_value": "0.1",
+        "description": "Numeric. Minimum proportion in each group for optimal cutoff (default: 0.1). Ensures at least 10% samples in each group (High/Low). Range: 0.05-0.3 percent Numeric. Percentile for quantile cutoff (default: 0.25). Only used when cutoff_type = \"quantile\". Range: 0-1 (0.25 = first quartile)"
+      },
+      {
+        "name": "percent",
+        "has_default": true,
+        "default_value": "0.25",
+        "description": "ile (see percent parameter)"
+      },
+      {
+        "name": "palette",
+        "has_default": true,
+        "default_value": "c(\"#ED6355\", \"#41A98E\", \"#EFA63A\", \"#3a6ea5\")",
+        "description": "Character vector. Colors for survival curves (default: c(\"#ED6355\", \"#41A98E\", \"#EFA63A\", \"#3a6ea5\")). Typically 2 colors for Scenario 16 (High/Low or Mutation/WildType)"
+      },
+      {
+        "name": "show_cindex",
+        "has_default": true,
+        "default_value": "TRUE",
+        "description": "Logical. Show concordance index in plot (default: TRUE). C-index measures predictive accuracy (0.5 = random, 1.0 = perfect)"
+      }
+    ],
+    "examples": "## Not run: \n##D # Scenario 16: Single gene, single cancer (KM + Cox)\n##D result <- cptac_survival(\n##D   var1 = \"TP53\",\n##D   var1_modal = \"RNAseq\",\n##D   var1_cancers = \"BRCA\",\n##D   surv_type = \"OS\",\n##D   cutoff_type = \"optimal\"\n##D )\n##D \n##D # Scenario 17: Multiple genes (Forest plot)\n##D result <- cptac_survival(\n##D   var1 = c(\"TP53\", \"EGFR\", \"KRAS\"),\n##D   var1_modal = \"RNAseq\",\n##D   var1_cancers = \"LUAD\",\n##D   surv_type = \"OS\"\n##D )\n##D \n##D # Scenario 17: Single gene, multiple cancers (Forest plot)\n##D result <- cptac_survival(\n##D   var1 = \"TP53\",\n##D   var1_modal = \"RNAseq\",\n##D   var1_cancers = c(\"BRCA\", \"LUAD\", \"COAD\"),\n##D   surv_type = \"OS\"\n##D )\n##D \n##D # Phospho sites survival (each site independent)\n##D result <- cptac_survival(\n##D   var1 = \"AKT1\",\n##D   var1_modal = \"Phospho\",\n##D   var1_cancers = c(\"BRCA\", \"LUAD\"),\n##D   surv_type = \"OS\",\n##D   cutoff_type = \"optimal\"\n##D )\n##D \n##D # Mutation survival (categorical, no cutoff needed)\n##D result <- cptac_survival(\n##D   var1 = \"KRAS\",\n##D   var1_modal = \"Mutation\",\n##D   var1_cancers = \"LUAD\",\n##D   surv_type = \"PFS\"\n##D )\n##D \n##D # Clinical variables\n##D result <- cptac_survival(\n##D   var1 = c(\"Age\", \"Tumor_Stage\"),\n##D   var1_modal = \"Clinical\",\n##D   var1_cancers = \"BRCA\",\n##D   surv_type = \"OS\"\n##D )\n## End(Not run)\n\n\n\n",
+    "return_value": "A list with 3 components: stats Data frame with survival analysis results: Scenario 16: km_pvalue, cox_hr, cox_hr_lower, cox_hr_upper, cox_pvalue, cox_cindex Scenario 17: variable (feature label), hr, hr_lower, hr_upper, p_value, cindex Note: hr > 1 indicates worse survival (higher risk) plot Plot object (ggplot or patchwork). Scenario 16: KM curve + Cox curve side-by-side. Scenario 17: Forest plot with HR and confidence intervals. Access: result$plot, attr(result$plot, \"width/height\") raw_data Data frame with merged data including survival time and event columns",
+    "references": ["**CPTAC Database**:  Clinical Proteomic Tumor Analysis Consortium (2020). Proteogenomic characterization of human cancers. Nature, 578, 34-35. \\doi{10.1038/d41586-020-00432-0}  Gillette MA, et al. (2020).", "Proteogenomic Characterization Reveals Therapeutic Vulnerabilities in Lung Adenocarcinoma. Cell, 182(1):200-225. \\doi{10.1016/j.cell.2020.06.013}  Database portal: \\url{https://proteomics.cancer.gov/programs/cptac}"],
+    "formatted_arguments": "var1: Character vector. Gene names or clinical variables. Single gene, single cancer → Scenario 16 (KM + Cox) Single gene, multiple cancers → Scenario 17 (Forest plot) Multiple genes → Scenario 17 (Forest plot) Phospho sites: Each site analyzed independently in Forest plot Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"AKT1\", \"MTOR\")\nvar1_modal: Character. Omics layer. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\" Note: Phospho sites will generate multiple features per gene\nvar1_cancers: Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Multiple cancers will use Forest plot (Scenario 17)\nsurv_type: Character. Type of survival endpoint (default: \"OS\"). \"OS\" - Overall Survival (time to death from any cause) \"PFS\" - Progression-Free Survival (time to disease progression or death)\ncutoff_type: Character. Method to dichotomize continuous variables (default: \"optimal\"). Only used for continuous variables (RNAseq, Protein, Phospho, logCNA, Methylation). Ignored for categorical variables (Mutation, Clinical). \"optimal\" - Maximizes log-rank test statistic (recommended) \"median\" - Use median value as cutoff \"mean\" - Use mean value as cutoff \"quantile\" - Use specified\nminprop: Numeric. Minimum proportion in each group for optimal cutoff (default: 0.1). Ensures at least 10% samples in each group (High/Low). Range: 0.05-0.3 percent Numeric. Percentile for quantile cutoff (default: 0.25). Only used when cutoff_type = \"quantile\". Range: 0-1 (0.25 = first quartile)\npercent: ile (see percent parameter)\npalette: Character vector. Colors for survival curves (default: c(\"#ED6355\", \"#41A98E\", \"#EFA63A\", \"#3a6ea5\")). Typically 2 colors for Scenario 16 (High/Low or Mutation/WildType)\nshow_cindex: Logical. Show concordance index in plot (default: TRUE). C-index measures predictive accuracy (0.5 = random, 1.0 = perfect)",
+    "simple_arguments": "var1: Character vector. Gene names or clinical variables. Single gene, single cancer → Scenario 16 (KM + Cox) Single gene, multiple cancers → Scenario 17 (Forest plot) Multiple genes → Scenario 17 (Forest plot) Phospho sites: Each site analyzed independently in Forest plot Examples: \"TP53\", c(\"TP53\", \"EGFR\"), c(\"AKT1\", \"MTOR\")\nvar1_modal: Character. Omics layer. Options: \"RNAseq\", \"Protein\", \"Phospho\", \"Mutation\", \"Clinical\", \"logCNA\", \"Methylation\" Note: Phospho sites will generate multiple features per gene\nvar1_cancers: Character vector. Cancer types. Options: \"BRCA\", \"LUAD\", \"COAD\", \"CCRCC\", \"GBM\", \"HNSCC\", \"LUSC\", \"OV\", \"PDAC\", \"UCEC\" Multiple cancers will use Forest plot (Scenario 17)"
+  }
+}

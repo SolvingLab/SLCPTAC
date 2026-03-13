@@ -1818,7 +1818,7 @@
 }
 
 
-#' Custom GSEA Dot Plot (替代BioEnricher::vis.GSEA.dot1)
+#' Custom GSEA Dot Plot
 #'
 #' @keywords internal
 .custom_gsea_dot <- function(res, type, show.term.num = 15, Select.P = "NP", cutoff.P = 0.05,
@@ -1903,7 +1903,7 @@
   return(p)
 }
 
-#' Custom GSEA Dot Plot (替代BioEnricher::vis.GSEA.dot1)
+#' Custom GSEA Dot Plot
 #'
 #' 修复：Negative类型不使用abs(NES)，直接用原始NES + reverse colors
 #'

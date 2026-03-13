@@ -391,24 +391,20 @@
 }
 
 
-#' Perform genome-wide DEA using BioEnricher
+#' Perform genome-wide DEA using limma
 #' @keywords internal
 .stats_dea_genome <- function(var_data, genome_matrix, var_cancers) {
-  # Match samples
   common_samples <- intersect(names(var_data), rownames(genome_matrix))
 
   if (length(common_samples) < 10) {
     stop("Too few overlapping samples (", length(common_samples), ")", call. = FALSE)
   }
 
-  # Use only common samples
   var_values <- var_data[common_samples]
   genome_values <- genome_matrix[common_samples, ]
 
-  # Drop unused factor levels
   var_values <- droplevels(var_values)
 
-  # Get group levels
   group_levels <- levels(var_values)
   if (length(group_levels) == 0) {
     stop("No data available: all values are missing or invalid", call. = FALSE)
@@ -423,7 +419,6 @@
     stop("DEA requires exactly 2 groups, found: ", length(group_levels), call. = FALSE)
   }
 
-  # Check sample size per group
   group_counts <- table(var_values)
   if (any(group_counts < 3)) {
     stop(
@@ -440,38 +435,29 @@
     group_levels[2], group_levels[1], length(common_samples), ncol(genome_values)
   ))
 
-  # Transpose for BioEnricher::DEA (genes as rows, samples as columns)
   expr_matrix <- t(genome_values)
 
-  # Prepare groups vector (must be factor with proper names)
-  groups <- var_values
+  groups <- factor(var_values, levels = group_levels)
   names(groups) <- common_samples
 
-  # Prepare contrasts: "Mutation-WildType"
-  contrasts <- paste0(group_levels[2], "-", group_levels[1])
+  design <- stats::model.matrix(~ 0 + groups)
+  colnames(design) <- group_levels
 
-  # Call BioEnricher::DEA
-  dea_result_list <- BioEnricher::DEA(
-    expr = expr_matrix,
-    groups = groups,
-    contrasts = contrasts,
-    Select.method = "limma",
-    cutoff.P = 1, # Don't filter, we'll do it later
-    cutoff.logFC = 0, # Don't filter by logFC
-    verbose = FALSE
-  )
+  contrast_str <- paste0(group_levels[2], "-", group_levels[1])
+  contrast_matrix <- limma::makeContrasts(contrasts = contrast_str, levels = design)
 
-  # Extract results data.frame from list
-  dea_results <- dea_result_list$res
+  fit <- limma::lmFit(expr_matrix, design)
+  fit <- limma::contrasts.fit(fit, contrast_matrix)
+  fit <- limma::eBayes(fit, trend = TRUE)
 
-  # Standardize column names
-  colnames(dea_results)[colnames(dea_results) == "Gene"] <- "gene"
+  dea_results <- limma::topTable(fit, number = Inf, sort.by = "none")
+  dea_results$gene <- rownames(dea_results)
+  rownames(dea_results) <- NULL
+
   colnames(dea_results)[colnames(dea_results) == "P.Value"] <- "pvalue"
   colnames(dea_results)[colnames(dea_results) == "adj.P.Val"] <- "p_adjusted"
 
-  rownames(dea_results) <- NULL
-
-  message(sprintf("  ✓ DEA completed: %d significant genes (p<0.05)", sum(dea_results$pvalue < 0.05, na.rm = TRUE)))
+  message(sprintf("  \u2713 DEA completed: %d significant genes (p<0.05)", sum(dea_results$pvalue < 0.05, na.rm = TRUE)))
 
   return(dea_results)
 }
@@ -528,9 +514,7 @@
 }
 
 
-#' Perform GSEA
-#' @keywords internal
-#' Perform GSEA using fgsea (following original implementation)
+#' Perform GSEA using fgsea with geneset package for gene set loading
 #' @keywords internal
 .perform_gsea <- function(ranked_genes,
                           enrich_type = "GO",
@@ -547,27 +531,19 @@
   ont_str <- if (!is.null(GO_ont) && enrich_type == "GO") paste0(" ", GO_ont) else ""
   message(sprintf("  Running GSEA (%s%s)...", enrich_type, ont_str))
 
-  # Check dependencies
   if (!requireNamespace("fgsea", quietly = TRUE)) {
     stop("Package 'fgsea' required. Install: BiocManager::install('fgsea')", call. = FALSE)
   }
-  if (!requireNamespace("BioEnricher", quietly = TRUE)) {
-    stop("Package 'BioEnricher' required for gene sets", call. = FALSE)
-  }
 
-  # Load gene sets using BioEnricher::get.geneset2
-  # 所有数据库都使用symbol（GO、KEGG、WIKI、Reactome均支持）
-  geneset_df <- BioEnricher::get.geneset2(
-    type = enrich_type,
-    org = "hs",
-    GO.ont = tolower(GO_ont),
-    KEGG.category = kegg_category,
-    Msigdb.category = msigdb_category,
-    HgDisease.source = hgdisease_source,
-    Mesh.method = mesh_method,
-    Mesh.category = mesh_category,
-    Enrichrdb.library = enrichrdb_library,
-    Return.symbol = TRUE
+  geneset_df <- .load_geneset_df(
+    enrich_type = enrich_type,
+    GO_ont = GO_ont,
+    kegg_category = kegg_category,
+    msigdb_category = msigdb_category,
+    hgdisease_source = hgdisease_source,
+    mesh_method = mesh_method,
+    mesh_category = mesh_category,
+    enrichrdb_library = enrichrdb_library
   )
 
   pathways <- split(geneset_df$gene, geneset_df$id)
@@ -575,7 +551,6 @@
 
   message(sprintf("  Loaded %d pathways", length(pathways)))
 
-  # Run fgseaMultilevel
   fgsea_result <- fgsea::fgseaMultilevel(
     pathways = pathways,
     stats = ranked_genes,
@@ -584,7 +559,6 @@
     nproc = n_workers
   )
 
-  # Format results
   stats <- as.data.frame(fgsea_result)
 
   if (nrow(stats) > 0) {
@@ -593,20 +567,170 @@
     colnames(stats)[colnames(stats) == "pval"] <- "pvalue"
     colnames(stats)[colnames(stats) == "padj"] <- "qvalue"
 
-    # Convert leadingEdge list to character
     stats$leadingEdge <- sapply(stats$leadingEdge, function(x) {
       paste(unlist(x), collapse = ",")
     })
 
-    # Reorder columns
     cols <- c("ID", "Description", "NES", "pvalue", "qvalue", "size", "leadingEdge")
     stats <- stats[, intersect(cols, colnames(stats)), drop = FALSE]
     stats <- stats[order(stats$pvalue), ]
   }
 
-  message(sprintf("  ✓ GSEA completed: %d pathways", nrow(stats)))
+  message(sprintf("  \u2713 GSEA completed: %d pathways", nrow(stats)))
 
   return(stats)
+}
+
+
+#' Load gene sets as data.frame using geneset + genekitr2 packages
+#'
+#' Uses geneset package directly for gene set retrieval, genekitr2 for ID conversion.
+#' Returns data.frame with columns: id, term, gene (symbol).
+#'
+#' @keywords internal
+.load_geneset_df <- function(enrich_type = "GO",
+                             GO_ont = "BP",
+                             kegg_category = "pathway",
+                             msigdb_category = "H",
+                             hgdisease_source = "do",
+                             mesh_method = "gendoo",
+                             mesh_category = "A",
+                             enrichrdb_library = "Cancer_Cell_Line_Encyclopedia") {
+
+  gs <- .fetch_raw_geneset(
+    enrich_type = enrich_type,
+    GO_ont = GO_ont,
+    kegg_category = kegg_category,
+    msigdb_category = msigdb_category,
+    hgdisease_source = hgdisease_source,
+    mesh_method = mesh_method,
+    mesh_category = mesh_category,
+    enrichrdb_library = enrichrdb_library
+  )
+
+  geneset_data <- gs$geneset
+  geneset_names <- gs$geneset_name
+
+  if (!is.data.frame(geneset_names) || (length(geneset_names) == 1 && is.na(geneset_names))) {
+    colnames(geneset_data) <- c("id", "gene")
+    geneset_names <- data.frame(
+      id = unique(geneset_data$id),
+      name = unique(geneset_data$id),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  colnames(geneset_names) <- c("id", "name")
+  colnames(geneset_data) <- c("id", "gene")
+
+  geneset_names$name <- Hmisc::capitalize(geneset_names$name)
+  geneset_names <- dplyr::distinct(geneset_names, id, name, .keep_all = TRUE)
+
+  # Convert Entrez IDs to gene symbols
+  gene_ids <- unique(geneset_data$gene)
+  gene_info <- genekitr2::genInfo(id = gene_ids, unique = TRUE, org = "hs")
+  id_col <- colnames(gene_info)[1]
+  gene_map <- stats::setNames(gene_info$symbol, gene_info[[id_col]])
+
+  geneset_data$gene <- gene_map[as.character(geneset_data$gene)]
+  geneset_data <- geneset_data[!is.na(geneset_data$gene), ]
+
+  result <- merge(geneset_names, geneset_data, by = "id", all.y = TRUE)
+  colnames(result) <- c("id", "term", "gene")
+  result$gene <- trimws(result$gene)
+  result$id <- trimws(result$id)
+  result$term <- trimws(result$term)
+
+  result
+}
+
+
+#' Fetch raw gene sets from geneset package
+#' @keywords internal
+.fetch_raw_geneset <- function(enrich_type, GO_ont, kegg_category, msigdb_category,
+                               hgdisease_source, mesh_method, mesh_category,
+                               enrichrdb_library) {
+
+  type_upper <- toupper(enrich_type)
+
+  if (type_upper == "GO") {
+    if (toupper(GO_ont) == "ALL") {
+      gs1 <- geneset::getGO(org = "hs", ont = "bp")
+      gs2 <- geneset::getGO(org = "hs", ont = "mf")
+      gs3 <- geneset::getGO(org = "hs", ont = "cc")
+      colnames(gs1$geneset)[1] <- colnames(gs2$geneset)[1] <- colnames(gs3$geneset)[1] <- "go"
+      geneset_data <- do.call(rbind, list(gs1$geneset, gs2$geneset, gs3$geneset))
+      root_terms <- c("GO:0005575", "GO:0003674", "GO:0008150")
+      geneset_data <- geneset_data[!geneset_data$go %in% root_terms, ]
+      geneset_name <- do.call(rbind, list(gs1$geneset_name, gs2$geneset_name, gs3$geneset_name))
+      geneset_name <- geneset_name[!geneset_name$id %in% root_terms, ]
+      gs <- list(geneset = geneset_data, geneset_name = geneset_name,
+                 organism = gs1$organism, type = "bp")
+    } else {
+      gs <- geneset::getGO(org = "hs", ont = tolower(GO_ont))
+      root_terms <- c("GO:0005575", "GO:0003674", "GO:0008150")
+      gs$geneset <- gs$geneset[!gs$geneset[[1]] %in% root_terms, ]
+      gs$geneset_name <- gs$geneset_name[!gs$geneset_name$id %in% root_terms, ]
+    }
+  } else if (type_upper == "KEGG") {
+    gs <- geneset::getKEGG(org = "hs", category = kegg_category)
+  } else if (type_upper == "MSIGDB") {
+    if (toupper(msigdb_category) == "H") {
+      gs <- geneset::getMsigdb(org = "hs", category = "H")
+      hall <- gs$geneset
+      hall$gs_name <- gsub("HALLMARK_", "", hall$gs_name)
+      hall$gs_name <- Hmisc::capitalize(tolower(hall$gs_name))
+      hall$gs_name <- gsub("_", " ", hall$gs_name)
+      hall$gs_name <- gsub("Dna", "DNA", hall$gs_name)
+      hall$gs_name <- gsub("E2f", "E2F", hall$gs_name)
+      hall$gs_name <- gsub("G2m", "G2M", hall$gs_name)
+      hall$gs_name <- gsub("Il2", "IL2", hall$gs_name)
+      hall$gs_name <- gsub("Il6", "IL6", hall$gs_name)
+      hall$gs_name <- gsub("stat", "STAT", hall$gs_name)
+      hall$gs_name <- gsub("jak", "JAK", hall$gs_name)
+      hall$gs_name <- gsub("IL2 STAT5", "IL-2/STAT5", hall$gs_name)
+      hall$gs_name <- gsub("IL6 JAK STAT3", "IL-6/JAK2/STAT3", hall$gs_name)
+      hall$gs_name <- gsub("Kras", "KRAS", hall$gs_name)
+      hall$gs_name <- gsub("dn", "down", hall$gs_name)
+      hall$gs_name <- gsub("Myc targets v", "MYC targets V", hall$gs_name)
+      hall$gs_name <- gsub("Pi3k akt mtor", "PI3K/AKT/mTOR", hall$gs_name)
+      hall$gs_name <- gsub("Tgf beta", "TGF-beta", hall$gs_name)
+      hall$gs_name <- gsub("Tnfa signaling via nfkb", "TNF-alpha signaling via NF-kB", hall$gs_name)
+      hall$gs_name <- gsub("Uv", "UV", hall$gs_name)
+      hall$gs_name <- gsub("Wnt beta catenin", "Wnt/beta-Catenin", hall$gs_name)
+      hall$gs_name <- gsub("Interferon gamma", "IFN-gamma", hall$gs_name)
+      hall$gs_name <- gsub("Interferon alpha", "IFN-alpha", hall$gs_name)
+      hall$gs_name <- gsub("Mtorc1", "mTORC1", hall$gs_name)
+      gs$geneset <- hall
+    } else if (toupper(msigdb_category) == "C2-CP") {
+      ids <- c("C2-CP-BIOCARTA", "C2-CP-KEGG", "C2-CP-PID", "C2-CP-REACTOME", "C2-CP-WIKIPATHWAYS")
+      combined <- do.call(rbind, lapply(ids, function(x) {
+        geneset::getMsigdb(org = "hs", category = toupper(x))[["geneset"]]
+      }))
+      colnames(combined) <- c("gs_name", "entrez_gene")
+      gs <- list(geneset = combined, geneset_name = NA, organism = "Hs", type = "Self")
+    } else {
+      gs <- geneset::getMsigdb(org = "hs", category = toupper(msigdb_category))
+    }
+  } else if (type_upper == "REACTOME") {
+    gs <- geneset::getReactome(org = "hs")
+  } else if (type_upper == "WIKI") {
+    gs <- geneset::getWiki(org = "hs")
+  } else if (type_upper == "HGDISEASE") {
+    gs <- geneset::getHgDisease(source = tolower(hgdisease_source))
+  } else if (type_upper == "MESH") {
+    if (!exists("mesh_metadata", envir = globalenv())) {
+      assign("mesh_metadata", geneset::mesh_metadata, envir = globalenv())
+      on.exit(rm("mesh_metadata", envir = globalenv()), add = TRUE)
+    }
+    gs <- geneset::getMesh(org = "hs", method = mesh_method, category = mesh_category)
+  } else if (type_upper == "ENRICHRDB") {
+    gs <- geneset::getEnrichrdb(org = "human", library = enrichrdb_library)
+  } else {
+    stop(sprintf("Unsupported enrich_type: %s", enrich_type), call. = FALSE)
+  }
+
+  gs
 }
 
 

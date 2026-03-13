@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{.custom_gsea_dot}
 \alias{.custom_gsea_dot}
-\title{Custom GSEA Dot Plot (替代BioEnricher::vis.GSEA.dot1)}
+\title{Custom GSEA Dot Plot}
 \usage{
 .custom_gsea_dot(
   res,
@@ -19,6 +19,6 @@
 )
 }
 \description{
-Custom GSEA Dot Plot (替代BioEnricher::vis.GSEA.dot1)
+Custom GSEA Dot Plot
 }
 \keyword{internal}

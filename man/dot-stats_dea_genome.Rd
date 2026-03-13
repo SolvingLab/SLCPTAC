@@ -2,11 +2,11 @@
 % Please edit documentation in R/stats.R
 \name{.stats_dea_genome}
 \alias{.stats_dea_genome}
-\title{Perform genome-wide DEA using BioEnricher}
+\title{Perform genome-wide DEA using limma}
 \usage{
 .stats_dea_genome(var_data, genome_matrix, var_cancers)
 }
 \description{
-Perform genome-wide DEA using BioEnricher
+Perform genome-wide DEA using limma
 }
 \keyword{internal}
