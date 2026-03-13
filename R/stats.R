@@ -38,7 +38,7 @@
   cor_data <- data[, c(var1_cols, var2_cols), drop = FALSE]
 
   # Calculate correlations using astat
-  cor_result <- astat::stat_cor(
+  cor_result <- stat_cor(
     x = cor_data,
     cor.method = method,
     use = use,
@@ -490,7 +490,7 @@
   rownames(genome_values) <- common_samples
 
   # Use astat for fast calculation
-  cor_result <- astat::stat_cor(
+  cor_result <- stat_cor(
     x = var_df,
     y = as.data.frame(genome_values),
     cor.method = method,

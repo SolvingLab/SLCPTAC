@@ -14,6 +14,7 @@
 #'
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
+  .ggforge_init()
   # Set ragg max dimension to 100000px (default is 50000px)
   # This allows saving large plots with many variables/genes
   # Example: 36 phospho sites × 30 genes each = very large plot

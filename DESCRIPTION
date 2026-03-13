@@ -16,34 +16,20 @@ Description: A comprehensive toolkit for mining and analyzing multi-omics cancer
     analysis scenarios covering all combinations of continuous and categorical variables.
 License: GPL (>= 3)
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.3.3
-Depends: 
-    R (>= 4.0.0)
-Imports:
-    qs (>= 0.25.0),
-    dplyr (>= 1.0.0),
-    ggplot2 (>= 3.3.0),
-    ggforge,
-    survival (>= 3.2.0),
-    patchwork (>= 1.1.0),
-    limma,
-    geneset,
-    genekitr2,
-    astat,
-    rlang (>= 1.0.0),
-    igraph (>= 1.2.0),
-    ggraph (>= 2.0.0),
-    fgsea (>= 1.18.0),
-    jsonlite (>= 1.7.0),
-    ComplexHeatmap,
-    Hmisc,
-    tidyr
-Suggests:
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0),
-    progress
+Depends: R (>= 4.0.0)
+Imports: qs (>= 0.25.0), dplyr (>= 1.0.0), ggplot2 (>= 3.3.0),
+        survival (>= 3.2.0), patchwork (>= 1.1.0), limma, geneset,
+        genekitr2, rlang (>= 1.0.0), igraph (>= 1.2.0), ggraph
+        (>= 2.0.0), fgsea (>= 1.18.0), jsonlite (>= 1.7.0),
+        ComplexHeatmap, Hmisc, tidyr,
+        ggnewscale, ggrepel, scales, circlize, methods, grid
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0), progress
+LazyData: true
 VignetteBuilder: knitr
 URL: https://github.com/SolvingLab/SLCPTAC
 BugReports: https://github.com/SolvingLab/SLCPTAC/issues
+NeedsCompilation: no
+Packaged: 2026-03-13 13:48:12 UTC; liuzaoqu
+Author: Zaoqu Liu [aut, cre] (<https://orcid.org/0000-0002-0452-742X>)
+Maintainer: Zaoqu Liu <liuzaoqu@163.com>

@@ -67,7 +67,7 @@
     xlab <- gsub(",\\s*[^)]+\\)", ")", var1_feat)
     ylab <- gsub(",\\s*[^)]+\\)", ")", var2_feat)
 
-    plot <- ggforge::CorPlot(
+    plot <- CorPlot(
       data = plot_data,
       x = var1_col,
       y = var2_col,
@@ -91,7 +91,7 @@
     # 格式: "GENE (Modal, Cancer)" -> "GENE (Modal)"
     var2_label <- gsub(",\\s*[^)]+\\)", ")", var2_feat)
 
-    plot <- ggforge::LollipopPlot(
+    plot <- LollipopPlot(
       data = stats_plot,
       x = "r",
       y = "y_label",
@@ -151,7 +151,7 @@
     # x轴标题：显示与单个变量的相关性
     single_var_label <- gsub(",\\s*[^)]+\\)", ")", single_var)
 
-    plot <- ggforge::LollipopPlot(
+    plot <- LollipopPlot(
       data = stats_plot,
       x = "r",
       y = "feature",
@@ -177,7 +177,7 @@
     stats_plot$neg_log10_p <- -log10(pmax(stats_plot[[p_col]], .Machine$double.xmin))
 
     # 使用 var1_feature 和 var2_feature 展示完整的相关性矩阵
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = stats_plot,
       x = "var1_feature",
       y = "var2_feature",
@@ -228,7 +228,7 @@
     stats_plot$var1_label <- gsub(",\\s*[^)]+\\)", ")", stats_plot$var1_feature)
     stats_plot$var2_label <- gsub(",\\s*[^)]+\\)", ")", stats_plot$var2_feature)
 
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = stats_plot,
       x = "var1_label",
       y = "var2_label",
@@ -251,7 +251,7 @@
     # Multi-cancer: DotPlot with expanded y-axis
     # var2_feature已经包含癌种信息，无需再添加
 
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = stats_plot,
       x = "var1_feature",
       y = "var2_feature",
@@ -570,7 +570,7 @@
 
     stats_plot$neg_log10_p <- -log10(pmax(stats_plot$p_value, .Machine$double.xmin))
 
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = stats_plot,
       x = "var1_feature",
       y = "var2_feature",
@@ -1002,7 +1002,7 @@
 
   cancer_type <- unique(data$cancer_type)
 
-  plot <- ggforge::Heatmap(
+  plot <- Heatmap(
     data = plot_matrix,
     cluster_rows = FALSE,
     cluster_columns = FALSE,
@@ -1297,7 +1297,7 @@
     }
 
     pos_pathways$neg_log10_p <- -log10(pmax(pos_pathways$pvalue, .Machine$double.xmin))
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = pos_pathways,
       x = "NES",
       y = "Description",
@@ -1323,7 +1323,7 @@
     }
 
     neg_pathways$neg_log10_p <- -log10(pmax(neg_pathways$pvalue, .Machine$double.xmin))
-    plot <- ggforge::DotPlot(
+    plot <- DotPlot(
       data = neg_pathways,
       x = "NES",
       y = "Description",
@@ -1429,7 +1429,7 @@
 
   # 使用RdBu palette同时显示正负值
   # 左图：显示来自positive基因列表的基因（但包含所有变量的正负值）
-  plot_up <- ggforge::DotPlot(
+  plot_up <- DotPlot(
     data = up_data,
     x = "var_name",
     y = "Gene",
@@ -1445,7 +1445,7 @@
   )
 
   # 右图：显示来自negative基因列表的基因（但包含所有变量的正负值）
-  plot_down <- ggforge::DotPlot(
+  plot_down <- DotPlot(
     data = down_data,
     x = "var_name",
     y = "Gene",
@@ -1607,7 +1607,7 @@
 
   # 使用RdBu palette同时显示正负值
   # 左图：显示来自positive pathway列表的pathways（但包含所有变量的正负NES）
-  plot_pos <- ggforge::DotPlot(
+  plot_pos <- DotPlot(
     data = pos_data,
     x = "var_name",
     y = "pathway_label",
@@ -1623,7 +1623,7 @@
   )
 
   # 右图：显示来自negative pathway列表的pathways（但包含所有变量的正负NES）
-  plot_neg <- ggforge::DotPlot(
+  plot_neg <- DotPlot(
     data = neg_data,
     x = "var_name",
     y = "pathway_label",
@@ -1728,8 +1728,8 @@
     var_col <- feature_cols[1]
   }
 
-  # 1. KM plot using ggforge::KMPlot
-  km_plot <- ggforge::KMPlot(
+  # 1. KM plot using KMPlot
+  km_plot <- KMPlot(
     data = plot_data,
     time = "time",
     status = "event",
@@ -1744,8 +1744,8 @@
     legend.position = "bottom"
   )
 
-  # 2. Cox Curve using ggforge::CoxPlot
-  cox_plot <- ggforge::CoxPlot(
+  # 2. Cox Curve using CoxPlot
+  cox_plot <- CoxPlot(
     data = plot_data,
     time = "time",
     event = "event",
